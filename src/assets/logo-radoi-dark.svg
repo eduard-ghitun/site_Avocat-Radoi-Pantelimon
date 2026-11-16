@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="80" viewBox="0 0 420 80" role="img" aria-labelledby="title">
+  <title id="title">Pantelimon Rădoi — Cabinet de Avocatură</title>
+  <g font-family="Georgia, 'Times New Roman', serif" font-weight="400">
+    <text x="2" y="60" font-size="61" letter-spacing="-5" fill="#4B3428">P</text>
+    <text x="23" y="65" font-size="56" letter-spacing="-4" fill="#A67B45">R</text>
+  </g>
+  <path d="M77 13v53" fill="none" stroke="#A67B45" stroke-width="1"/>
+  <text x="94" y="36" fill="#4B3428" font-family="Georgia, 'Times New Roman', serif" font-size="27" letter-spacing="-.7">Pantelimon Rădoi</text>
+  <text x="96" y="59" fill="#846440" font-family="Arial, sans-serif" font-size="10.5" font-weight="600" letter-spacing="3.05">CABINET DE AVOCATURĂ</text>
+</svg>

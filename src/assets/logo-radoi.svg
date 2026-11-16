@@ -1,12 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="404" height="76" viewBox="0 0 404 76" role="img" aria-labelledby="title">
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="80" viewBox="0 0 420 80" role="img" aria-labelledby="title">
   <title id="title">Pantelimon Rădoi — Cabinet de Avocatură</title>
-  <g fill="none" stroke="#D6BEA1" stroke-width="1.25">
-    <rect x="1" y="1" width="72" height="72"/>
-    <path d="M8 8h57M8 66h57M8 8v57M65 8v57" opacity=".36"/>
-    <path d="M20 54h34M37 18v36" opacity=".5"/>
+  <g font-family="Georgia, 'Times New Roman', serif" font-weight="400">
+    <text x="2" y="60" font-size="61" letter-spacing="-5" fill="#F5F1EB">P</text>
+    <text x="23" y="65" font-size="56" letter-spacing="-4" fill="#C29B63">R</text>
   </g>
-  <text x="36" y="49" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="30" letter-spacing="-5" fill="#F5F1EB">PR</text>
-  <path d="M92 53h15" stroke="#D6BEA1" stroke-width="1"/>
-  <text x="121" y="34" font-family="Georgia, 'Times New Roman', serif" font-size="24" letter-spacing="1.6" fill="#F5F1EB">PANTELIMON RĂDOI</text>
-  <text x="122" y="55" font-family="Arial, sans-serif" font-size="9" letter-spacing="3.8" fill="#D6BEA1">CABINET DE AVOCATURĂ</text>
+  <path d="M77 13v53" fill="none" stroke="#C29B63" stroke-width="1"/>
+  <text x="94" y="36" fill="#F5F1EB" font-family="Georgia, 'Times New Roman', serif" font-size="27" letter-spacing="-.7">Pantelimon Rădoi</text>
+  <text x="96" y="59" fill="#D8BA90" font-family="Arial, sans-serif" font-size="10.5" font-weight="600" letter-spacing="3.05">CABINET DE AVOCATURĂ</text>
 </svg>

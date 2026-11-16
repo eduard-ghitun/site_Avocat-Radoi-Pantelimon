@@ -32,6 +32,24 @@ export const values = [
   ['Angajament și perseverență', 'Explorăm toate opțiunile legale.'],
   ['Comunicare constantă', 'Explicăm procedurile și oferim actualizări pe parcurs.']
 ];
+// Recenzii publice de pe profilul Google Maps al cabinetului, verificate la 16.11.2026.
+export const googleReviews = [
+  {
+    author: 'Cosmin Ich', rating: 5,
+    text: 'Recomand cu mare încredere! Cel mai bun !!!!',
+    url: 'https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT205a1MzYzFhREJSTkdKbFVuQmtZM3BCZWkxME5GRRAB!2m1!1s0x0:0x284b8ae2fdabdcca!3m1!1s2@1:CAIQACodChtycF9oOm9kS3c1aDBRNGJlUnBkY3pBei10NFE%7C%7C?hl=ro'
+  },
+  {
+    author: 'Cristian Voinea', rating: 5,
+    text: 'Un om minunat, cu rabdare, profesionalism, gata oricand sa ajute si cu foarte mult bun-simt! Il recomand cu toata increderea!',
+    url: 'https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2pKV1FXWlphMEZVZUZkbVFYRk5RbXhDVUdoT09VRRAB!2m1!1s0x0:0x284b8ae2fdabdcca!3m1!1s2@1:CAIQACodChtycF9oOjJWQWZZa0FUeFdmQXFNQmxCUGhOOUE%7C%7C?hl=ro'
+  },
+  {
+    author: 'Berindeie Alexandru (Personal account)', rating: 5,
+    text: 'Recomand cu toată încrederea! Un avocat profesionist, serios și dedicat, care și-a făcut treaba impecabil. Comunicarea a fost clară, promptă și constantă. M-a sprijinit în fiecare pas și a fost mereu disponibil. Sunt foarte mulțumit de colaborare.',
+    url: 'https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT21WNmJXdzNZalZQYXpOeFZuUlhRWHBzUXpWdVpWRRAB!2m1!1s0x0:0x284b8ae2fdabdcca!3m1!1s2@1:CAIQACodChtycF9oOmV6bWw3YjVPazNxVnRXQXpsQzVuZVE%7C%7C?hl=ro'
+  }
+];
 export const faqs = [
   ['În ce situații pot primi despăgubiri după un accident rutier?', 'Dacă ai fost implicat într-un accident rutier fără vină, poți solicita despăgubiri pentru vătămări corporale, daune materiale sau morale.'],
   ['Oferiți servicii și pentru companii sau doar pentru persoane fizice?', 'Cabinetul colaborează atât cu persoane fizice, cât și cu persoane juridice și oferă consultanță și reprezentare în drept civil, penal, al muncii și comercial.'],

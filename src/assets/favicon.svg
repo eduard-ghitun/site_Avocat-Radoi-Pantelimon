@@ -1,6 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" fill="#4b3428"/>
-  <rect x="4" y="4" width="56" height="56" fill="none" stroke="#d6bea1" stroke-width="1.5"/>
-  <path d="M11 11h42M11 53h42" stroke="#d6bea1" opacity=".4"/>
-  <text x="31" y="42" text-anchor="middle" fill="#f5f1eb" font-family="Georgia,serif" font-size="29" letter-spacing="-4">PR</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Pantelimon Rădoi</title>
+  <rect width="64" height="64" fill="#4B3428"/>
+  <g font-family="Georgia, 'Times New Roman', serif" font-weight="400">
+    <text x="7" y="49" font-size="45" letter-spacing="-4" fill="#F5F1EB">P</text>
+    <text x="24" y="53" font-size="41" letter-spacing="-3" fill="#C29B63">R</text>
+  </g>
 </svg>

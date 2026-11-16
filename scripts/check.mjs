@@ -26,7 +26,7 @@ const contactHtml = await readFile(join(dist, 'contact', 'index.html'), 'utf8');
 if (!contactHtml.includes('maps.google.com/maps?q=44.4838785%2C26.1089708') || !contactHtml.includes('Pantelimon+R%C4%83doi')) {
   throw new Error('Contact page is missing the cabinet map or its Google Maps link');
 }
-for (const asset of ['styles.css', 'uikit.min.css', 'main.js', 'favicon.svg', 'og.svg', 'logo-radoi.svg']) await access(join(dist, 'assets', asset));
+for (const asset of ['styles.css', 'uikit.min.css', 'main.js', 'favicon.svg', 'og.svg', 'logo-radoi.svg', 'logo-radoi-dark.svg']) await access(join(dist, 'assets', asset));
 if (!contactHtml.includes('class="uk-form-stacked"') || !contactHtml.includes('class="uk-input"') || !contactHtml.includes('class="uk-textarea"')) {
   throw new Error('Contact form is missing UIkit form components');
 }
