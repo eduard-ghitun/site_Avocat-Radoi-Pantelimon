@@ -1,0 +1,13 @@
+{
+  "name": "cabinet-pantelimon-radoi",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/check.mjs",
+    "dev": "node scripts/build.mjs && node scripts/dev.mjs"
+  },
+  "dependencies": {
+    "uikit": "^3.25.31"
+  }
+}

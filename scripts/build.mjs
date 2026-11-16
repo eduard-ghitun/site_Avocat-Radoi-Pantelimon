@@ -1,0 +1,106 @@
+import { mkdir, rm, writeFile, cp, readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { cabinet, pages, services, values, faqs, articles } from '../src/content.mjs';
+
+const root = fileURLToPath(new URL('../', import.meta.url));
+const out = join(root, 'dist');
+const posts = JSON.parse(await readFile(join(root, 'src', 'blog-posts.json'), 'utf8'));
+const serviceContent = JSON.parse(await readFile(join(root, 'src', 'service-content.json'), 'utf8'));
+const origin = (process.env.SITE_URL || 'https://avocatpantelimonradoi.ro').replace(/\/$/, '');
+const noindex = process.env.NOINDEX !== 'false';
+const esc = (v = '') => String(v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const cleanTitle = value => value.replace(/<[^>]*>/g, '').replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code))).replace(/&amp;/g, '&');
+const cleanHtml = value => value.replace(/<(script|style|iframe|form)\b[^>]*>[\s\S]*?<\/\1>/gi, '').replace(/\s+on\w+\s*=\s*("[^"]*"|'[^']*')/gi, '').replace(/javascript:/gi, '');
+const href = slug => slug ? `/${slug}/` : '/';
+const phoneHref = `tel:${cabinet.phone.replace(/\s/g, '')}`;
+const arrow = '<span aria-hidden="true">↗</span>';
+const link = (label, url, cls = 'button') => `<a class="${cls}${cls === 'button' ? ' uk-button' : ''}" href="${esc(url)}">${esc(label)} ${arrow}</a>`;
+const label = text => `<p class="kicker"><span></span>${esc(text)}</p>`;
+const photo = (file, alt, cls = '') => `<img class="${cls}" src="/assets/photos/${file}.png" alt="${esc(alt)}" loading="lazy" decoding="async">`;
+const header = active => {
+  const serviceLinks = services.map(s => `<a href="/servicii/${s.slug}/">${esc(s.title)}</a>`).join('');
+  const desktopNav = pages.map(p => p.slug === 'servicii'
+    ? `<div class="nav-dropdown"><a href="/servicii/" ${active === 'servicii' ? 'aria-current="page"' : ''}>Servicii <span class="dropdown-chevron" aria-hidden="true">⌄</span></a><div class="dropdown-panel" aria-label="Domenii de practică">${serviceLinks}<a class="dropdown-all" href="/servicii/">Toate serviciile ${arrow}</a></div></div>`
+    : `<a href="${href(p.slug)}" ${p.slug === active ? 'aria-current="page"' : ''}>${esc(p.label)}</a>`).join('');
+  const mobileNav = pages.map(p => p.slug === 'servicii'
+    ? `<details class="mobile-services"><summary>Servicii <span aria-hidden="true">⌄</span></summary><div class="mobile-service-links"><a href="/servicii/">Toate serviciile</a>${serviceLinks}</div></details>`
+    : `<a href="${href(p.slug)}" ${p.slug === active ? 'aria-current="page"' : ''}>${esc(p.label)}</a>`).join('');
+  return `<header class="site-header"><div class="topbar"><div class="container topbar-inner"><span>${esc(cabinet.coverage)} · Disponibilitate 24/24</span><div><a href="mailto:${esc(cabinet.email)}">${esc(cabinet.email)}</a><a href="${phoneHref}">${esc(cabinet.phone)}</a></div></div></div><div class="container nav-row"><a class="brand" href="/" aria-label="Pantelimon Rădoi — Acasă"><img src="/assets/logo-radoi.svg" alt="Pantelimon Rădoi — Cabinet de Avocatură" width="404" height="76"></a><nav class="desktop-nav" aria-label="Navigare principală">${desktopNav}</nav>${link('Programează o întâlnire', '/contact/', 'nav-cta')}<button class="menu-toggle" type="button" aria-label="Deschide meniul" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span><span></span></button></div><nav class="mobile-nav" id="mobile-menu" aria-label="Navigare mobilă" hidden>${mobileNav}${link('Programează o întâlnire', '/contact/', 'nav-cta')}</nav></header>`;
+};
+const mailFallback = () => `<aside class="mail-fallback" id="mail-fallback" data-email="${esc(cabinet.email)}" aria-labelledby="mail-fallback-title" hidden><button class="mail-fallback-close" type="button" aria-label="Închide opțiunile de email">×</button><h2 id="mail-fallback-title">Scrie un email</h2><p>Dacă aplicația de email nu s-a deschis, alege serviciul folosit sau copiază adresa.</p><div class="mail-fallback-actions"><a class="mail-gmail" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=${encodeURIComponent(cabinet.email)}" target="_blank" rel="noopener noreferrer">Gmail ↗</a><a class="mail-outlook" href="https://outlook.live.com/mail/0/deeplink/compose?to=${encodeURIComponent(cabinet.email)}" target="_blank" rel="noopener noreferrer">Outlook ↗</a></div><label for="mail-copy-value">Adresă de email</label><textarea id="mail-copy-value" readonly rows="1">${esc(cabinet.email)}</textarea><button class="mail-copy-button" type="button">Copiază adresa</button><p class="mail-copy-status" role="status" aria-live="polite"></p></aside>`;
+const footer = () => `<footer class="footer"><div class="container footer-grid"><div class="footer-brand"><img src="/assets/logo-radoi.svg" alt="Pantelimon Rădoi — Cabinet de Avocatură" width="404" height="76"><p>Consultații juridice, asistență și reprezentare în instanță, în București și la nivel național.</p></div><div><h3>Explorează</h3>${pages.map(p => `<a href="${href(p.slug)}">${esc(p.label)}</a>`).join('')}</div><div><h3>Domenii de practică</h3>${services.slice(0, 5).map(s => `<a href="/servicii/${s.slug}/">${esc(s.title)}</a>`).join('')}</div><div><h3>Contact</h3><a href="${phoneHref}">${esc(cabinet.phone)}</a><a href="mailto:${esc(cabinet.email)}">${esc(cabinet.email)}</a><p>${esc(cabinet.address)}</p><p>${esc(cabinet.schedule)}</p></div></div><div class="container footer-bottom"><span>© ${new Date().getFullYear()} ${esc(cabinet.name)}</span><span>Informațiile au caracter general și nu reprezintă consultanță juridică.</span></div></footer>`;
+const pageHero = (kicker, title, intro) => `<section class="page-hero"><div class="container">${label(kicker)}<h1>${esc(title)}</h1><p>${esc(intro)}</p></div></section>`;
+const serviceCards = list => `<div class="service-grid">${list.map((s, i) => `<a class="service-card uk-card" href="/servicii/${s.slug}/"><span class="card-num">${String(i + 1).padStart(2, '0')}</span><h3 class="uk-card-title">${esc(s.title)}</h3><p>${esc(s.intro)}</p><span class="card-arrow">Află mai mult ${arrow}</span></a>`).join('')}</div>`;
+const cta = (title = 'Ai nevoie de sprijin juridic?') => `<section class="cta-band"><div class="container cta-inner"><div>${label('CONTACTEAZĂ CABINETUL')}<h2>${esc(title)}</h2><p>Programează o întâlnire online sau la cabinet pentru a discuta situația ta.</p></div>${link('Programează o consultație', '/contact/')}</div></section>`;
+const faqBlock = () => `<section class="section faq-section"><div class="container faq-layout"><div>${label('ÎNTREBĂRI FRECVENTE')}<h2>Răspunsuri la întrebările tale.</h2><p>O primă orientare pentru cele mai frecvente situații. Fiecare speță necesită o analiză individuală.</p></div><div class="faq-list">${faqs.map(([q, a]) => `<details><summary>${esc(q)}<span aria-hidden="true">+</span></summary><p>${esc(a)}</p></details>`).join('')}</div></div></section>`;
+
+function home() {
+  return `<main id="main"><section class="hero"><div class="hero-photo">${photo('hero-radoi', '', 'hero-image')}</div><div class="hero-shade"></div><div class="container hero-inner"><div class="hero-copy">${label('AVOCAT · BAROUL BUCUREȘTI')}<h1>Pantelimon<br>Rădoi<span>.</span></h1><h2>Un plan clar pentru situația ta.</h2><p>Servicii juridice complete în București și la nivel național: consultanță, asistență și reprezentare în instanță, în drept civil, penal, al muncii și comercial.</p><div class="hero-actions">${link('Programează o întâlnire', '/contact/')}${link('Descoperă serviciile', '/servicii/', 'hero-text-link')}</div></div></div></section>
+  <section class="quick-services"><div class="container quick-grid">${services.slice(0, 3).map((s, i) => `<a href="/servicii/${s.slug}/"><span>0${i + 1}</span><strong>${esc(s.title)}</strong>${arrow}</a>`).join('')}</div></section>
+  <section class="section about-section"><div class="container about-layout"><div class="about-image">${photo('home-radoi', 'Pantelimon Rădoi în cabinetul de avocatură')}<div class="image-tag">BAROUL BUCUREȘTI · PANTELIMON RĂDOI</div></div><div class="about-copy">${label('DESPRE NOI')}<h2>Fiecare caz merită atenție individuală.</h2><p>La Cabinetul de Avocatură Pantelimon Rădoi, clientul este în centrul atenției. Deciziile strategice sunt luate cu grijă pentru interesele sale, cu profesionalism, rigoare și confidențialitate.</p><p>${esc(cabinet.biography)}</p>${link('Mai multe despre cabinet', '/despre-noi/', 'text-link')}</div></div></section>
+  <section class="section services-section"><div class="container"><div class="section-heading">${label('DOMENII DE PRACTICĂ')}<h2>Servicii juridice pentru fiecare etapă.</h2><p>Sprijin pentru persoane fizice și firme, de la analiza documentelor și redactarea contractelor până la negociere, mediere și reprezentare.</p></div>${serviceCards(services)}<div class="section-end">${link('Toate serviciile', '/servicii/', 'text-link')}</div></div></section>
+  <section class="stats-band"><div class="container stats-grid"><div><strong>${esc(cabinet.caseCount)}</strong><span>Dosare soluționate</span></div><div><strong>24/24</strong><span>Disponibilitate non-stop</span></div><div><strong>România</strong><span>Arie de acoperire</span></div></div></section>
+  <section class="section values-section"><div class="container">${label('VALORILE NOASTRE')}<h2>Încrederea se construiește prin fapte.</h2><div class="values-grid">${values.map(([name, desc], i) => `<article><span>0${i + 1}</span><h3>${esc(name)}</h3><p>${esc(desc)}</p></article>`).join('')}</div></div></section>
+  <section class="section steps-section"><div class="container steps-layout"><div>${label('ETAPELE COLABORĂRII')}<h2>Strategie. Expertiză. Reprezentare.</h2><p>La întâlnirea inițială analizăm documentele, stabilim un obiectiv realist și explicăm pașii juridici, termenele estimate și costurile.</p>${link('Stabilește o întâlnire', '/contact/')}</div><div class="steps-list"><article><span>01</span><h3>Discuție preliminară</h3><p>Înțelegem situația și obiectivele tale.</p></article><article><span>02</span><h3>Documentare și analiză</h3><p>Studiem documentele și opțiunile legale.</p></article><article><span>03</span><h3>Reprezentare și asistență</h3><p>Urmărim demersurile stabilite împreună.</p></article></div></div></section>${faqBlock()}${cta()}</main>`;
+}
+function about() {
+  return `<main id="main">${pageHero('DESPRE NOI', 'Cabinetul de Avocatură Pantelimon Rădoi', 'Profesionalism, dedicare și o strategie adaptată fiecărui caz.')}
+  <section class="section"><div class="container about-layout"><div class="about-image">${photo('about-radoi', 'Pantelimon Rădoi, avocat membru al Baroului București')}</div><div class="about-copy">${label('CINE SUNTEM')}<h2>Alături de tine, de la prima întâlnire.</h2><p>${esc(cabinet.biography)}</p><p>Oferim consultanță adaptată situației tale, reprezentare în instanță și în fața autorităților, sprijin pentru persoane fizice și firme și monitorizarea dosarului pe parcursul colaborării.</p><p>Ne asumăm responsabilitatea profesională și acționăm cu diligență, de la întâlnirea inițială până la finalizarea cazului.</p>${link('Contactează-ne', '/contact/')}</div></div></section>
+  <section class="section values-section"><div class="container">${label('VALORILE NOASTRE')}<h2>Principiile care ne ghidează.</h2><div class="values-grid">${values.map(([name, desc], i) => `<article><span>0${i + 1}</span><h3>${esc(name)}</h3><p>${esc(desc)}</p></article>`).join('')}</div></div></section>${cta()}</main>`;
+}
+function servicesPage() {
+  return `<main id="main">${pageHero('SERVICII', 'Domenii de practică', 'Consultanță, asistență și reprezentare juridică în București și la nivel național.')}
+  <section class="section"><div class="container"><div class="services-intro"><div>${label('CE OFERIM')}<h2>Soluții juridice adaptate situației tale.</h2></div><div><p>Cabinetul oferă sprijin în domenii precum drept civil, comercial, penal, al familiei, bancar și fiscal, al muncii, imobiliar și insolvență.</p><p>Poți solicita ajutor pentru redactarea contractelor, analiza documentelor, negocieri, medieri și reprezentare în fața instanțelor. Consultațiile se pot desfășura online sau la cabinet.</p></div></div>${serviceCards(services)}</div></section>${cta()}</main>`;
+}
+function servicePage(s) {
+  const fullText = serviceContent[s.slug];
+  if (!fullText) throw new Error(`Missing service content: ${s.slug}`);
+  return `<main id="main">${pageHero('SERVICII / ' + s.title.toUpperCase(), s.title, s.intro)}<section class="section"><div class="container detail-layout"><div>${label('CU CE TE PUTEM AJUTA')}<h2>Asistență juridică pentru ${esc(s.title.toLowerCase())}.</h2><p>${esc(s.intro)}</p>${link('Discută cu un avocat', '/contact/')}</div><div class="detail-article">${cleanHtml(fullText.html)}<p class="source-note">Conținut publicat de <a href="${esc(fullText.url)}" target="_blank" rel="noopener noreferrer">Cabinetul de Avocatură Pantelimon Rădoi ↗</a>.</p></div></div></section>${cta()}</main>`;
+}
+function blog() {
+  return `<main id="main">${pageHero('BLOG', 'Articole juridice', 'Articole publicate de avocatul Pantelimon Rădoi.')}
+  <section class="section"><div class="container"><div class="section-heading">${label('ULTIMELE ARTICOLE')}<h2>Informații și perspective juridice.</h2></div><div class="article-grid">${articles.map(a => `<article class="uk-card uk-card-body"><span class="article-date">${esc(a.date)} · Pantelimon Rădoi</span><h2>${esc(a.title)}</h2><p>${esc(a.summary)}</p><a class="text-link" href="/blog/${new URL(a.url).pathname.split('/').filter(Boolean).at(-1)}/">Citește articolul ${arrow}</a></article>`).join('')}</div></div></section>${cta('Ai o întrebare despre situația ta?')}</main>`;
+}
+function articlePage(post) {
+  const date = new Date(post.date).toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' });
+  const safe = cleanHtml(post.content);
+  return `<main id="main">${pageHero('BLOG · ' + date.toUpperCase(), cleanTitle(post.title), 'Articol publicat de avocatul Pantelimon Rădoi.')}
+  <section class="section"><div class="container article-layout"><article class="article-body uk-article">${safe}</article><aside class="uk-card uk-card-body"><h2>Ai o întrebare?</h2><p>Informațiile din acest articol sunt generale. Pentru o analiză a situației tale, contactează cabinetul.</p>${link('Programează o consultație', '/contact/')}<a class="text-link" href="${esc(post.link)}" target="_blank" rel="noopener noreferrer">Vezi articolul original ${arrow}</a></aside></div></section>${cta()}</main>`;
+}
+function contact() {
+  return `<main id="main">${pageHero('CONTACT', 'Hai să discutăm', 'Programează o consultație online sau la cabinet. Suntem disponibili 24h din 24.')}
+  <section class="section"><div class="container contact-layout"><div class="contact-info">${label('DATE DE CONTACT')}<h2>Suntem aici să te ascultăm.</h2><p>Poți suna sau scrie pentru a stabili o întâlnire. Cabinetul se află pe Bulevardul Pipera, nr. 1 și oferă servicii în București și la nivel național.</p><div class="contact-list"><div><span>TELEFON</span><a href="${phoneHref}">${esc(cabinet.phone)}</a></div><div><span>EMAIL</span><a href="mailto:${esc(cabinet.email)}">${esc(cabinet.email)}</a></div><div><span>ADRESĂ</span><strong>${esc(cabinet.address)}</strong><a class="contact-map-link" href="${esc(cabinet.mapUrl)}" target="_blank" rel="noopener noreferrer">Vezi indicațiile de orientare ${arrow}</a></div><div><span>PROGRAM</span><strong>${esc(cabinet.schedule)}</strong></div></div></div><div class="contact-card uk-card">${label('PROGRAMEAZĂ O CONSULTAȚIE')}<h2>Trimite un mesaj.</h2><p>Formularul deschide aplicația ta de email cu un mesaj pregătit. Verifică-l și trimite-l de acolo.</p><form class="uk-form-stacked" id="contact-form" data-email="${esc(cabinet.email)}" novalidate><label>Nume și prenume <input class="uk-input" name="name" autocomplete="name" required minlength="2" maxlength="100" placeholder="Numele tău"></label><label>Adresă de email <input class="uk-input" name="email" type="email" autocomplete="email" required maxlength="150" placeholder="nume@exemplu.ro"></label><label>Telefon <input class="uk-input" name="phone" type="tel" autocomplete="tel" maxlength="30" placeholder="Numărul tău"></label><label>Mesaj <textarea class="uk-textarea" name="message" required minlength="20" maxlength="3000" rows="5" placeholder="Descrie pe scurt situația ta"></textarea></label><label class="consent"><input class="uk-checkbox" name="consent" type="checkbox" required><span>Accept ca datele introduse să fie folosite pentru a răspunde solicitării mele.</span></label><button class="button uk-button" type="submit">Pregătește mesajul ${arrow}</button><p id="form-status" role="status" aria-live="polite"></p></form></div></div></section>
+  <section class="location-section" aria-labelledby="location-title"><div class="container"><div class="location-heading"><div>${label('UNDE NE GĂSEȘTI')}<h2 id="location-title">Locația cabinetului.</h2><p>${esc(cabinet.address)}</p></div>${link('Deschide în Google Maps', cabinet.mapUrl, 'location-link')}</div><div class="map-frame"><iframe src="${esc(cabinet.mapEmbedUrl)}" title="Harta Google Maps cu locația Cabinetului de Avocatură Pantelimon Rădoi" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div></div></section></main>`;
+}
+const renderers = [home, about, servicesPage, blog, contact];
+const document = (page, body, path = href(page.slug)) => {
+  const canonical = `${origin}${path}`;
+  return `<!doctype html><html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#4b3428"><title>${esc(page.title)}</title><meta name="description" content="${esc(page.description)}">${noindex ? '<meta name="robots" content="noindex,nofollow">' : ''}<link rel="canonical" href="${esc(canonical)}"><meta property="og:type" content="website"><meta property="og:locale" content="ro_RO"><meta property="og:title" content="${esc(page.title)}"><meta property="og:description" content="${esc(page.description)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:image" content="${origin}/assets/og.svg"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/assets/uikit.min.css"><link rel="stylesheet" href="/assets/styles.css"><script src="/assets/main.js" defer></script></head><body><a class="skip-link" href="#main">Sari la conținut</a>${header(page.slug)}${body}${footer()}${mailFallback()}</body></html>`;
+};
+
+await rm(out, { recursive: true, force: true });
+await mkdir(join(out, 'assets'), { recursive: true });
+for (const file of ['styles.css', 'main.js']) await cp(join(root, 'src', file), join(out, 'assets', file));
+await cp(join(root, 'node_modules', 'uikit', 'dist', 'css', 'uikit.min.css'), join(out, 'assets', 'uikit.min.css'));
+for (const file of ['favicon.svg', 'og.svg', 'logo-radoi.svg']) await cp(join(root, 'src', 'assets', file), join(out, 'assets', file));
+await cp(join(root, 'src', 'assets', 'photos'), join(out, 'assets', 'photos'), { recursive: true });
+for (let i = 0; i < pages.length; i++) {
+  const dir = join(out, pages[i].slug);
+  await mkdir(dir, { recursive: true });
+  await writeFile(join(dir, 'index.html'), document(pages[i], renderers[i]()), 'utf8');
+}
+for (const s of services) {
+  const dir = join(out, 'servicii', s.slug);
+  await mkdir(dir, { recursive: true });
+  await writeFile(join(dir, 'index.html'), document({ ...pages[2], title: `${s.title} | Pantelimon Rădoi`, description: s.intro }, servicePage(s), `/servicii/${s.slug}/`), 'utf8');
+}
+for (const post of posts) {
+  const dir = join(out, 'blog', post.slug);
+  await mkdir(dir, { recursive: true });
+  await writeFile(join(dir, 'index.html'), document({ ...pages[3], title: `${cleanTitle(post.title)} | Pantelimon Rădoi`, description: 'Articol juridic publicat de avocatul Pantelimon Rădoi.' }, articlePage(post), `/blog/${post.slug}/`), 'utf8');
+}
+const urls = [...pages.map(p => href(p.slug)), ...services.map(s => `/servicii/${s.slug}/`), ...posts.map(p => `/blog/${p.slug}/`)];
+await writeFile(join(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(u => `<url><loc>${origin}${u}</loc></url>`).join('')}</urlset>`, 'utf8');
+await writeFile(join(out, 'robots.txt'), noindex ? 'User-agent: *\nDisallow: /\n' : `User-agent: *\nAllow: /\nSitemap: ${origin}/sitemap.xml\n`, 'utf8');
+console.log(`Generated ${urls.length} pages in ${out}`);
