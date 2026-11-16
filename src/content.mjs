@@ -2,6 +2,11 @@
 export const cabinet = {
   name: 'Cabinet de Avocatură Pantelimon Rădoi', phone: '+40 785 869 247',
   email: 'avocat.pantelimon@gmail.com', address: 'Bulevardul Pipera, nr. 1, România',
+  social: {
+    facebook: 'https://www.facebook.com/profile.php?id=61575209152877',
+    instagram: 'https://www.instagram.com/avocat.pantelimonradoi/',
+    linkedin: 'https://www.linkedin.com/in/pantelimon-r%C4%83doi-a8002a257/'
+  },
   mapUrl: 'https://www.google.com/maps/place/Pantelimon+R%C4%83doi/@44.4838785,26.1089708,592m/data=!3m2!1e3!4b1!4m6!3m5!1s0x290c8b5785d0e4ad:0x284b8ae2fdabdcca!8m2!3d44.4838785!4d26.1089708!16s%2Fg%2F11zh_yq65t?entry=ttu',
   mapEmbedUrl: 'https://maps.google.com/maps?q=44.4838785%2C26.1089708&z=17&output=embed',
   schedule: 'Luni – Duminică · 24h din 24', coverage: 'București și la nivel național', caseCount: '+1400',

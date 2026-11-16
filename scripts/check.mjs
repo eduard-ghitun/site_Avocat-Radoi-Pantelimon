@@ -9,7 +9,8 @@ const posts = JSON.parse(await readFile(join(root, 'src', 'blog-posts.json'), 'u
 const expected = [
   ...pages.map(page => join(dist, page.slug, 'index.html')),
   ...services.map(service => join(dist, 'servicii', service.slug, 'index.html')),
-  ...posts.map(post => join(dist, 'blog', post.slug, 'index.html'))
+  ...posts.map(post => join(dist, 'blog', post.slug, 'index.html')),
+  join(dist, 'politica-cookie-uri-ue', 'index.html')
 ];
 for (const file of expected) {
   const html = await readFile(file, 'utf8');
@@ -18,6 +19,7 @@ for (const file of expected) {
     const href = page.slug ? `/${page.slug}/` : '/';
     if (!html.includes(`href="${href}"`)) throw new Error(`Missing navigation to ${href} in ${file}`);
   }
+  if (!html.includes('href="/politica-cookie-uri-ue/"')) throw new Error(`Missing cookie policy header link in ${file}`);
   if (!html.includes('href="mailto:avocat.pantelimon@gmail.com"') || !html.includes('id="mail-fallback"')) {
     throw new Error(`Email compose link or fallback options missing from ${file}`);
   }
@@ -25,6 +27,10 @@ for (const file of expected) {
 const contactHtml = await readFile(join(dist, 'contact', 'index.html'), 'utf8');
 if (!contactHtml.includes('maps.google.com/maps?q=44.4838785%2C26.1089708') || !contactHtml.includes('Pantelimon+R%C4%83doi')) {
   throw new Error('Contact page is missing the cabinet map or its Google Maps link');
+}
+const cookiePolicyHtml = await readFile(join(dist, 'politica-cookie-uri-ue', 'index.html'), 'utf8');
+if (!cookiePolicyHtml.includes('<h1>Politică cookie-uri (UE)</h1>') || !cookiePolicyHtml.includes('Google Maps')) {
+  throw new Error('Cookie policy page is missing its title or service information');
 }
 for (const asset of ['styles.css', 'uikit.min.css', 'main.js', 'favicon.svg', 'og.svg', 'logo-radoi.svg', 'logo-radoi-dark.svg']) await access(join(dist, 'assets', asset));
 if (!contactHtml.includes('class="uk-form-stacked"') || !contactHtml.includes('class="uk-input"') || !contactHtml.includes('class="uk-textarea"')) {
