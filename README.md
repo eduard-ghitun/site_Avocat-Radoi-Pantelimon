@@ -34,9 +34,9 @@ Fișierele publicabile sunt în `dist/`. Setează `SITE_URL` la domeniul final �
 
 ## Contact
 
-Formularul pregătește un mesaj în aplicația de email a vizitatorului. Vizitatorul îl verifică și îl trimite de acolo. Datele publice de contact sunt telefonul `+40 785 869 247`, adresa `avocat.pantelimon@gmail.com` și Bulevardul Pipera, nr. 1.
+Formularul validează câmpurile și acordul, apoi deschide WhatsApp la `+40 785 869 247` cu numele, emailul, telefonul și mesajul precompletate. Vizitatorul apasă „Trimite” în WhatsApp pentru expediere. Datele publice de contact sunt telefonul `+40 785 869 247`, adresa `avocat.pantelimon@gmail.com` și Bulevardul Pipera, nr. 1.
 
-Un clic pe adresa de email deschide un mesaj nou prin `mailto:`. Dacă vizitatorul nu are o aplicație de email configurată, pe pagină apar opțiuni pentru Gmail, Outlook și copierea adresei. După completarea formularului, aceste opțiuni păstrează și subiectul și mesajul pregătit. Trimiterea efectivă se face din contul de email al vizitatorului.
+Un clic pe adresa de email deschide un mesaj nou prin `mailto:`. Dacă vizitatorul nu are o aplicație de email configurată, pe pagină apar opțiuni pentru Gmail, Outlook și copierea adresei. Aceste opțiuni sunt separate de formularul WhatsApp.
 
 Pagina Contact include o hartă Google Maps cu punctul cabinetului la coordonatele `44.4838785, 26.1089708` și un link către fișa Google Maps furnizată pentru cabinet.
 

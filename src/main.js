@@ -78,41 +78,16 @@ if (mailFallback) {
 const form = document.querySelector('#contact-form');
 if (form) {
   const status = document.querySelector('#form-status');
-  const submit = form.querySelector('button[type="submit"]');
-  const endpoint = form.dataset.endpoint;
-  const email = form.dataset.email;
-  form.addEventListener('submit', async event => {
+  form.addEventListener('submit', event => {
     event.preventDefault();
     if (!form.reportValidity()) return;
-    if (!endpoint && !email) return;
     const data = Object.fromEntries(new FormData(form).entries());
     if (!data.consent) {
       status.textContent = 'Confirmă acordul pentru prelucrarea datelor.';
       return;
     }
-    if (endpoint) {
-      submit.disabled = true;
-      status.textContent = 'Mesajul se trimite…';
-      try {
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify(data)
-        });
-        if (!response.ok) throw new Error('Trimiterea a eșuat');
-        form.reset();
-        status.textContent = 'Mesajul a fost trimis. Îți mulțumim!';
-      } catch {
-        status.textContent = 'Mesajul nu a putut fi trimis. Te rugăm să folosești adresa de email sau să încerci mai târziu.';
-      } finally {
-        submit.disabled = false;
-      }
-      return;
-    }
-    const subject = `Solicitare prin site — ${data.name}`;
-    const body = `Nume: ${data.name}\nEmail: ${data.email}\nTelefon: ${data.phone || '—'}\n\nMesaj:\n${data.message}`;
-    showMailFallback(subject, body);
-    window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    status.textContent = 'Se deschide aplicația ta de email. Dacă nu se deschide, poți folosi Gmail, Outlook sau copia mesajul din opțiunile afișate.';
+    const message = `Nume: ${data.name}\nEmail: ${data.email}\nTelefon: ${data.phone || '—'}\n\nMesaj:\n${data.message}`;
+    status.textContent = 'Se deschide WhatsApp. Apasă Trimite în WhatsApp pentru a expedia mesajul.';
+    window.location.href = `https://wa.me/40785869247?text=${encodeURIComponent(message)}`;
   });
 }
