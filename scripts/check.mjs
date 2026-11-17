@@ -43,7 +43,7 @@ if (!homeHtml.includes('href="/assets/uikit.min.css"') || !homeHtml.includes('cl
 if (!homeHtml.includes('name="theme-color" content="#4b3428"')) {
   throw new Error('Browser theme color does not match the brown brand palette');
 }
-for (const asset of ['hero-radoi.png', 'home-radoi.png', 'about-radoi.png', 'services-radoi.png', 'contact-radoi.png']) await access(join(dist, 'assets', 'photos', asset));
+for (const asset of ['hero-radoi.png', 'home-radoi.jpeg', 'about-radoi.png', 'services-radoi.png', 'contact-radoi.png']) await access(join(dist, 'assets', 'photos', asset));
 await access(join(dist, 'sitemap.xml'));
 await access(join(dist, 'robots.txt'));
 console.log(`Checked ${expected.length} pages, navigation, and shared assets.`);
